@@ -7,7 +7,8 @@ import {
   addDoc,
 } from 'firebase/firestore';
 
-const config = functions.config();
+const config = functions.config().config;
+console.log(config);
 
 const firebaseConfig = {
   apiKey: config.api_key,
