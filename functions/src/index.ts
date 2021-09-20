@@ -1,5 +1,26 @@
 import * as functions from 'firebase-functions';
-import axios from 'axios';
+import { initializeApp } from 'firebase/app';
+import {
+  getFirestore,
+  connectFirestoreEmulator,
+  collection,
+  addDoc,
+} from 'firebase/firestore';
+
+const config = functions.config();
+
+const firebaseConfig = {
+  apiKey: config.api_key,
+  authDomain: config.auth_domain,
+  projectId: config.project_id,
+  storageBucket: config.storage_bucket,
+  messagingSenderId: config.messaging_sender_id,
+  appId: config.app_id,
+};
+
+initializeApp(firebaseConfig);
+const db = getFirestore();
+connectFirestoreEmulator(db, 'localhost', 8080);
 
 // // Start writing Firebase Functions
 // // https://firebase.google.com/docs/functions/typescript
@@ -8,15 +29,14 @@ export const helloWorld = functions
   .region('asia-northeast1')
   .https.onRequest(async (request, response) => {
     try {
-      const res = await axios.get('http://placehold.jp/150x150.png', {
-        responseType: 'arraybuffer',
+      const docRef = await addDoc(collection(db, 'users'), {
+        first: 'Ada',
+        last: 'Lovelace',
+        born: 1815,
       });
-
-      functions.logger.info('get image', res.data);
-    } catch (err) {
-      functions.logger.info('failed get image');
+      console.log('Document written with ID: ', docRef.id);
+    } catch (e) {
+      console.error('Error adding document: ', e);
     }
-
-    functions.logger.info('Hello logs!', { structuredData: true });
     response.send('Hello from Firebase!');
   });
