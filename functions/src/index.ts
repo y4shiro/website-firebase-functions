@@ -8,7 +8,7 @@ import {
 } from 'firebase/firestore';
 
 const config = functions.config().config;
-console.log(config);
+const env = config.env;
 
 const firebaseConfig = {
   apiKey: config.api_key,
@@ -21,7 +21,7 @@ const firebaseConfig = {
 
 initializeApp(firebaseConfig);
 const db = getFirestore();
-connectFirestoreEmulator(db, 'localhost', 8080);
+if (env === 'development') connectFirestoreEmulator(db, 'localhost', 8080);
 
 // // Start writing Firebase Functions
 // // https://firebase.google.com/docs/functions/typescript
@@ -34,6 +34,7 @@ export const helloWorld = functions
         first: 'Ada',
         last: 'Lovelace',
         born: 1815,
+        env: config.env,
       });
       console.log('Document written with ID: ', docRef.id);
     } catch (e) {
