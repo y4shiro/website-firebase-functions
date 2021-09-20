@@ -9,3 +9,5 @@ typings/
 node_modules/
 
 .runtimeconfig.json
+portfolio-storage-99a47-firebase-adminsdk.json
+firebase-adminsdk.json

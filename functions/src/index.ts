@@ -1,27 +1,13 @@
 import * as functions from 'firebase-functions';
-import { initializeApp } from 'firebase/app';
-import {
-  getFirestore,
-  connectFirestoreEmulator,
-  collection,
-  addDoc,
-} from 'firebase/firestore';
+import * as admin from 'firebase-admin';
 
 const config = functions.config().config;
-const env = config.env;
 
-const firebaseConfig = {
-  apiKey: config.api_key,
-  authDomain: config.auth_domain,
-  projectId: config.project_id,
-  storageBucket: config.storage_bucket,
-  messagingSenderId: config.messaging_sender_id,
-  appId: config.app_id,
-};
+admin.initializeApp({
+  credential: admin.credential.applicationDefault(),
+});
 
-initializeApp(firebaseConfig);
-const db = getFirestore();
-if (env === 'development') connectFirestoreEmulator(db, 'localhost', 8080);
+const db = admin.firestore();
 
 // // Start writing Firebase Functions
 // // https://firebase.google.com/docs/functions/typescript
@@ -30,7 +16,9 @@ export const helloWorld = functions
   .region('asia-northeast1')
   .https.onRequest(async (request, response) => {
     try {
-      const docRef = await addDoc(collection(db, 'users'), {
+      const docRef = db.collection('users').doc('alovelace');
+
+      await docRef.set({
         first: 'Ada',
         last: 'Lovelace',
         born: 1815,
