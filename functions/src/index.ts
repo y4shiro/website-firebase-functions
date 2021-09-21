@@ -9,33 +9,17 @@ admin.initializeApp({
   storageBucket: config.storage_bucket,
 });
 
-const db = admin.firestore();
 const storage = admin.storage();
-
 const fetchUrl = config.fetch_url;
 
-// // Start writing Firebase Functions
-// // https://firebase.google.com/docs/functions/typescript
-//
-export const helloWorld = functions
+export const getGitHubGraph = functions
   .region('asia-northeast1')
   .https.onRequest(async (request, response) => {
     try {
+      // axios でダウンロード
       const imgRes = await axisos(fetchUrl, {
         responseType: 'arraybuffer',
       });
-
-      const docRef = db.collection('image').doc('svg');
-
-      await docRef.set({
-        header: imgRes.headers,
-        data: imgRes.data,
-        status: imgRes.status,
-        env: config.env,
-        bucket: config.storage_bucket,
-      });
-      console.log(imgRes.headers['content-type']);
-      console.log('Document written with ID: ', docRef.id);
 
       // Cloud Storage に書き込む
       const blob = storage.bucket().file('test.svg');
