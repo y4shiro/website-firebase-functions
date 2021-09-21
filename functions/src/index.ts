@@ -12,6 +12,8 @@ admin.initializeApp({
 const db = admin.firestore();
 const storage = admin.storage();
 
+const fetchUrl = config.fetch_url;
+
 // // Start writing Firebase Functions
 // // https://firebase.google.com/docs/functions/typescript
 //
@@ -19,11 +21,11 @@ export const helloWorld = functions
   .region('asia-northeast1')
   .https.onRequest(async (request, response) => {
     try {
-      const imgRes = await axisos('http://placehold.jp/150x150.png', {
+      const imgRes = await axisos(fetchUrl, {
         responseType: 'arraybuffer',
       });
 
-      const docRef = db.collection('image').doc('png');
+      const docRef = db.collection('image').doc('svg');
 
       await docRef.set({
         header: imgRes.headers,
@@ -32,13 +34,14 @@ export const helloWorld = functions
         env: config.env,
         bucket: config.storage_bucket,
       });
+      console.log(imgRes.headers['content-type']);
       console.log('Document written with ID: ', docRef.id);
 
       // Cloud Storage に書き込む
-      const blob = storage.bucket().file('test.png');
+      const blob = storage.bucket().file('test.svg');
       const blobStream = blob.createWriteStream({
         resumable: false,
-        metadata: { 'Content-Type': 'image/png' },
+        metadata: { 'Content-Type': imgRes.headers['content-type'] },
       });
 
       blobStream.on('error', (err) => {
