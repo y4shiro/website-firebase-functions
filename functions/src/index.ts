@@ -14,7 +14,9 @@ const fetchUrl = config.fetch_url;
 
 export const getGitHubGraph = functions
   .region('asia-northeast1')
-  .https.onRequest(async (request, response) => {
+  .pubsub.schedule('0 */12 * * *') // 12時間おきに実行
+  .timeZone('Asia/Tokyo')
+  .onRun(async () => {
     try {
       // axios でダウンロード
       const imgRes = await axisos(fetchUrl, {
@@ -22,7 +24,7 @@ export const getGitHubGraph = functions
       });
 
       // Cloud Storage に書き込む
-      const blob = storage.bucket().file('test.svg');
+      const blob = storage.bucket().file('github_graph.svg');
       const blobStream = blob.createWriteStream({
         resumable: false,
         metadata: { 'Content-Type': imgRes.headers['content-type'] },
@@ -40,5 +42,4 @@ export const getGitHubGraph = functions
     } catch (e) {
       console.error('Error adding document: ', e);
     }
-    response.send('Hello from Firebase!');
   });
